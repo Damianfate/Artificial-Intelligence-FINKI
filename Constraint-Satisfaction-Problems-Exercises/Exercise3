@@ -1,0 +1,32 @@
+from constraint import *
+
+def meeting_time_constr(time,marija,petar):
+    if time not in simona_domen or (marija and petar):
+        return False
+    if(marija and time in marija_domen) or (petar and time in petar_domen):
+        return True
+
+if __name__ == '__main__':
+    problem = Problem(BacktrackingSolver())
+
+    # ---Dadeni se promenlivite, dodadete gi domenite-----
+    domain=range(12,20)
+    marija_domen=[14,15,18]
+    simona_domen=[13,14,16,19]
+    petar_domen=[12,13,16,17,18,19]
+    problem.addVariable("Marija_prisustvo", [0,1])
+    problem.addVariable("Simona_prisustvo", [1])
+    problem.addVariable("Petar_prisustvo", [0,1])
+    problem.addVariable("vreme_sostanok", domain)
+    # ----------------------------------------------------
+
+    # ---Tuka dodadete gi ogranichuvanjata----------------
+    problem.addConstraint(meeting_time_constr, ["vreme_sostanok","Marija_prisustvo","Petar_prisustvo"])
+
+    # ----------------------------------------------------
+    order=['Simona_prisustvo','Marija_prisustvo','Petar_prisustvo','vreme_sostanok']
+    for solution in problem.getSolutions():
+        order1={key:solution[key] for key in order}
+        print(order1)
+    
+    # [print(solution) for solution in problem.getSolutions()]
