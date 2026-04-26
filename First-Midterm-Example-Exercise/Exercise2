@@ -1,0 +1,53 @@
+from constraint import *
+
+if __name__ == '__main__':
+    problem = Problem(BacktrackingSolver())
+    GRID_SIZE=6
+
+    # ----------------------------------------------------
+    # ---Prochitajte gi informaciite od vlezot
+    m=int(input())
+    trees=[]
+    for i in range(m):
+        treeX,treeY=tuple(int(n) for n in input().split(" "))
+        trees.append((treeX,treeY))
+
+    # -----------------------------------------------------
+    # ---Izberete promenlivi i domeni so koi bi sakale da rabotite-----
+    variables=range(m)
+    for i in range(m):
+        tx,ty=trees[i]
+        domain=[]
+        for dx,dy in [(0,1),(0,-1),(1,0),(-1,0)]:
+            nx,ny=tx+dx,ty+dy
+            if 0<=nx<GRID_SIZE and 0<=ny<GRID_SIZE and (nx,ny) not in trees:
+                domain.append((nx,ny))
+
+        problem.addVariable(i,domain)
+
+
+
+    # -----------------------------------------------------
+    # ---Potoa dodadete ogranichuvanjata-------------------
+
+    problem.addConstraint(AllDifferentConstraint(),variables)
+
+    def tent_proximity_constraint(t1,t2):
+        return not (abs(t1[0]-t2[0])<=1 and abs(t1[1]-t2[1])<=1)
+
+    for i in range(m):
+        for j in range(i+1,m):
+            problem.addConstraint(tent_proximity_constraint,(i,j))
+
+    # -----------------------------------------------------
+    # ---Potoa pobarajte reshenie--------------------------
+
+    solution = problem.getSolution()
+
+    # -----------------------------------------------------
+    # ---Na kraj otpechatete gi poziciite na shatorite-----
+    for i in range(m):
+        x,y=solution[i]
+        print(f"{x} {y}")
+
+
