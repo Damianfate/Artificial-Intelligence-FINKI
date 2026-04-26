@@ -1,0 +1,61 @@
+from copy import deepcopy
+from searching_framework import *
+
+class Boxes(Problem):
+    def __init__(self, initial, n, goal=None):
+        super().__init__(initial, goal)
+        self.n = n
+
+    def actions(self, state):
+        return self.successor(state).keys()
+
+    def result(self, state, action):
+        return self.successor(state)[action]
+
+    def goal_test(self, state):
+        return len(state[1]) == len(state[2])
+
+    def successor(self, state):
+        successor = {}
+        player_pos = state[0]
+        boxes = state[1]  # ова е веќе тупла
+        marked_boxes = list(state[2])
+        
+        moves = [(0, 1), (1, 0)]
+        move_names_list = ["Gore", "Desno"]
+        
+        for move, move_name in zip(moves, move_names_list):
+            new_pos = (player_pos[0] + move[0], player_pos[1] + move[1])
+            
+            if 0 <= new_pos[0] < self.n and 0 <= new_pos[1] < self.n and new_pos not in boxes:
+                
+                new_marked_boxes = list(marked_boxes)
+                
+                for box in boxes:
+                    if box not in new_marked_boxes and \
+                            abs(box[0] - new_pos[0]) <= 1 and \
+                            abs(box[1] - new_pos[1]) <= 1:
+                        new_marked_boxes.append(box)
+                
+                new_marked_boxes.sort() 
+                
+                successor[move_name] = (new_pos, boxes, tuple(new_marked_boxes))
+                
+        return successor
+
+if __name__ == '__main__':
+    n = int(input())
+    num_boxes = int(input())
+    boxes = []
+    for _ in range(num_boxes):
+        boxes.append(tuple(map(int, input().split(','))))
+
+    initial = ((0, 0), tuple(boxes), tuple())
+    p = Boxes(initial, n)
+    
+    solution = breadth_first_graph_search(p)
+    
+    if solution:
+        print(solution.solution())
+    else:
+        print("No Solution!")
